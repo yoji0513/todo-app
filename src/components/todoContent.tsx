@@ -1,6 +1,5 @@
 import { Box, Button, Checkbox, Flex, FormLabel, Heading, Input, List, ListItem } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import '../App.css';
 
 type TodoListProps = {
   id: number
