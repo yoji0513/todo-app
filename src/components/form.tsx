@@ -1,55 +1,81 @@
-import { Box, Flex, FormLabel, Heading, Input } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import { Button, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, useDisclosure } from '@chakra-ui/react';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux'
+import { add } from '../features/todo/todoSlice'
 
 type TodoListProps = {
   id: number
-  todoName: string
-  isDone: boolean
+  title: string
+  description: string
+  status: string
 }
 
-export const TodoContent= () => {
-  const [todoList, setTodoList] = useState<TodoListProps[]>([]);
-  const [inputTodo, setInputTodo] = useState<string>('');
+export const Form= () => {
+  const dispatch = useDispatch()
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [id, setId] = useState<number>(0)
+  const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [status, setStatus] = useState<string>('');
 
-  const todoInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputTodo(event.target.value)
-  }
-
-  const TodoId = () => {
+  const todoId = () => {
     setId(id + 1)
-    console.log(id)
   }
 
-  const submit = () => {
-    if(!inputTodo) return
+  const submit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault()
+    if(!description) return
     const newTodo: TodoListProps = {
-      id: todoList.length,
-      todoName: inputTodo,
-      isDone: false
+      id: id,
+      title: title,
+      description: description,
+      status: status
     }
-    setTodoList([...todoList, newTodo])
-    setInputTodo('')
+    setTitle('')
+    setDescription('')
+    setStatus('')
+    dispatch(add(newTodo))
   }
   
   return (
     <>
-      <form onClick={submit}>
-        <Box>
-          <FormLabel>TODO名</FormLabel>
-          <Input type={'text'} className={'input'} onChange={todoInput} value={inputTodo} placeholder={'TODOを入力してください。'} />
-        </Box>
-        <Input type={'button'} className={'button'} value={'追加'} onClick={TodoId}/>
-      </form>
-      <Heading as={'h2'} size={'md'} mt={'1rem'}>TODO一覧</Heading>
-      <Flex gap={'2'} mt={'1rem'}>
-        <Box w={'50%'}>
-          <Heading as={'h3'} size={'sm'}>TODO</Heading>
-        </Box>
-        <Box w={'50%'}>
-          <Heading as={'h3'} size={'sm'}>DONE</Heading>
-        </Box>
-      </Flex>
+      <Button onClick={onOpen}>TODOを追加する</Button>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <ModalHeader pl={0}>TODOを追加</ModalHeader>
+              <FormControl mb={'.8rem'}>
+                <FormLabel>ステータス</FormLabel>
+                <Select placeholder={'ステータスを選んでください。'} value={status} onChange={e => setStatus(e.target.value)}>
+                  <option value='TODO'>TODO</option>
+                  <option value='DOING'>DOING</option>
+                  <option value='DONE'>DONE</option>
+                </Select>
+              </FormControl>
+              <FormControl mb={'.8rem'}>
+                <FormLabel>TODO名</FormLabel>
+                <Input type={'text'} value={title} onChange={e => setTitle(e.target.value)} placeholder={'TODO名を入力してください。'} />
+              </FormControl>
+              <FormControl mb={'.8rem'}>
+                <FormLabel>内容</FormLabel>
+                <Input type={'text'} value={description} onChange={e => setDescription(e.target.value)} placeholder={'TODOの内容入力してください。'} />
+              </FormControl>
+              <Button
+                colorScheme={'teal'}
+                mt={'.8rem'}
+                onClick={(e) => {
+                  todoId()
+                  submit(e)
+                  onClose()
+                }}
+              >
+                追加
+              </Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>      
     </>
   );
 }

@@ -1,50 +1,21 @@
-import { Box, Button, Checkbox, Flex, FormLabel, Heading, Input, List, ListItem } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import type { RootState } from '../app/store'
+import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { Box, Button, Card, CardBody, Flex, Heading, Input, Link, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, Select, Text, useDisclosure } from '@chakra-ui/react'
+import { remove } from '../features/todo/todoSlice'
 
-type TodoListProps = {
-  id: number
-  todoName: string
-  isDone: boolean
-}
+export const TodoList= () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const todo = useSelector((state: RootState) => state.addTodo)
+  const dispatch = useDispatch()
 
-export const TodoContent= () => {
-  const [todoList, setTodoList] = useState<TodoListProps[]>([]);
-  const [inputTodo, setInputTodo] = useState<string>('');
-
-  const todoInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputTodo(event.target.value)
-  }
-
-  const submit = () => {
-    if(!inputTodo) return
-    const newTodo: TodoListProps = {
-      id: todoList.length,
-      todoName: inputTodo,
-      isDone: false
-    }
-    setTodoList([...todoList, newTodo])
-    setInputTodo('')
-  }
-
-  const remove = (id: number) => {
-    setTodoList(todoList.filter(todo => todo.id !== id))
-  }
-
-  const checkedSubmit = (id: number, shouldDone: boolean) => {
-    const newTodoList = todoList.map(todo => todo.id === id ? {...todo, isDone: shouldDone} : todo)
-    setTodoList(newTodoList)
+  const todoRemove = (id: number) => {
+    dispatch(remove(id))
   }
   
   return (
     <>
-      <form onClick={submit}>
-        <Box>
-          <FormLabel>TODO名</FormLabel>
-          <Input type={'text'} className={'input'} onChange={todoInput} value={inputTodo} placeholder={'TODOを入力してください。'} />
-        </Box>
-        <Input type={'button'} className={'button'} value={'追加'} />
-      </form>
-      <Heading as={'h2'} size={'md'} mt={'1rem'}>TODO一覧</Heading>
+      <Heading as={'h2'} size={'md'} mt={'2.4rem'}>TODO一覧</Heading>
       <Flex gap={'2'} mt={'1rem'}>
         <Box w={'50%'}>
           <Heading as={'h3'} size={'sm'}>TODO</Heading>
@@ -53,28 +24,56 @@ export const TodoContent= () => {
           <Heading as={'h3'} size={'sm'}>DONE</Heading>
         </Box>
       </Flex>
-      <Flex gap={'2'} mt={'1rem'}>
+    <Flex gap={'2'} mt={'1rem'}>
         <List w={'50%'}>
-          {todoList.filter((todo) => !todo.isDone).map((item) => (
-            <ListItem key={item.id} mb={'.8rem'}>
-              <Box as={'span'} display={'flex'} alignItems={'center'} gap={'1rem'}>
-                <Checkbox onChange={() => checkedSubmit(item.id, true)}/>
-                {item.todoName}
-                <Button fontSize={'.8rem'} onClick={() => remove(item.id)}>remove</Button>
-              </Box>
+            <ListItem mb={'.8rem'}>
+              {todo.todoList.filter(todo => todo.status === 'TODO').map(item =>
+                <Box key={item.id}>
+                  <Link onClick={onOpen}>
+                    <Card>
+                      <CardBody>
+                        <Text mb={'.8rem'}>{item.title}</Text>
+                        <Button fontSize={'.8rem'} onClick={() => todoRemove(item.id)}>remove</Button>
+                      </CardBody>
+                    </Card>
+                  </Link>
+                  <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        {item.status}
+                        {item.title}
+                        {item.description}
+                      </ModalBody>
+                    </ModalContent>
+                  </Modal>
+                </Box>
+              )}
+              {todo.todoList.filter(todo => todo.status === 'DOING').map(item =>
+                <Box key={item.id}>
+                  <Link onClick={onOpen}>
+                    <Card>
+                      <CardBody>
+                        <Text mb={'.8rem'}>{item.title}</Text>
+                        <Button fontSize={'.8rem'} onClick={() => todoRemove(item.id)}>remove</Button>
+                      </CardBody>
+                    </Card>
+                  </Link>
+                  <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        <Text>{item.status}</Text>
+                        <Text>{item.title}</Text>
+                        <Text>{item.description}</Text>
+                      </ModalBody>
+                    </ModalContent>
+                  </Modal>
+                </Box>
+              )}
             </ListItem>
-          ))}
-        </List>
-        <List w={'50%'}>
-          {todoList.filter((todo) => todo.isDone).map((item) => (
-            <ListItem key={item.id} mb={'.8rem'}>
-              <Box as={'span'} display={'flex'} alignItems={'center'} gap={'1rem'}>
-                <Checkbox defaultChecked onChange={() => checkedSubmit(item.id, false)}/>
-                {item.todoName}
-                <Button fontSize={'.8rem'} onClick={() => remove(item.id)}>remove</Button>
-              </Box>
-            </ListItem>
-          ))}
         </List>
       </Flex>
     </>
