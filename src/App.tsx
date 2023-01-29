@@ -1,5 +1,5 @@
 import { Box, Heading } from '@chakra-ui/react';
-import { TodoContent } from './components/todoContent';
+import { TodoContent } from './components/form';
 
 const App = () => {
   return (
