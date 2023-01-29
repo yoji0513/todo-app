@@ -15,23 +15,19 @@ export const TodoContent= () => {
     setInputTodo(event.target.value)
   }
 
-  const submit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const submit = () => {
     if(!inputTodo) return
-    setTodoList([
-      ...todoList, 
-      {
-        id: todoList.length,
-        todoName: inputTodo,
-        isDone: false
-      }
-    ])
+    const newTodo: TodoListProps = {
+      id: todoList.length,
+      todoName: inputTodo,
+      isDone: false
+    }
+    setTodoList([...todoList, newTodo])
     setInputTodo('')
   }
 
   const remove = (id: number) => {
-    setTodoList(todoList.filter((_, i) => i !== id))
-    return todoList
+    setTodoList(todoList.filter(todo => todo.id !== id))
   }
 
   const checkedSubmit = (id: number, shouldDone: boolean) => {
@@ -41,12 +37,12 @@ export const TodoContent= () => {
   
   return (
     <>
-      <form onSubmit={submit}>
+      <form onClick={submit}>
         <Box>
           <FormLabel>TODO名</FormLabel>
-          <Input type='text' className='input' onChange={todoInput} value={inputTodo} placeholder='TODOを入力してください。' />
+          <Input type={'text'} className={'input'} onChange={todoInput} value={inputTodo} placeholder={'TODOを入力してください。'} />
         </Box>
-        <Input type='submit' className='button' value='追加' />
+        <Input type={'button'} className={'button'} value={'追加'} />
       </form>
       <Heading as={'h2'} size={'md'} mt={'1rem'}>TODO一覧</Heading>
       <Flex gap={'2'} mt={'1rem'}>
