@@ -1,5 +1,4 @@
 import { Box, Heading } from '@chakra-ui/react';
-import './App.css';
 import { TodoContent } from './components/todoContent';
 
 const App = () => {
