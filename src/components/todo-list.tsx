@@ -11,9 +11,11 @@ import { ja } from 'date-fns/locale'
 export const TodoList= () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const todo = useSelector((state: RootState) => state.addTodo)
+  const status = useSelector((state: RootState) => state.addStatus)
   const dispatch = useDispatch()
   const [selectedItem, setSelectedItem] = useState<number>(1)
   const [today, setToday] = useState<string>('')
+  const listItemWidth = Math.floor(100 / status.statusList.length)
   useEffect(() => {
     const today = new Date();
     const formatToday = format(today, 'yyyy-MM-dd', {
@@ -40,12 +42,15 @@ export const TodoList= () => {
     <>
       <Heading as={'h2'} size={'md'} mt={'2.4rem'}>TODO一覧</Heading>
       <Flex gap={'2'} mt={'1rem'}>
-        <Box w={'50%'}>
-          <Heading as={'h3'} size={'sm'}>TODO</Heading>
-        </Box>
-        <Box w={'50%'}>
-          <Heading as={'h3'} size={'sm'}>DONE</Heading>
-        </Box>
+        <>
+        {status.statusList.map((statusItem, index) => {
+          return(
+            <Box key={index} width={`${listItemWidth}%`}>
+              <Heading as={'h3'} size={'sm'}>{statusItem.status}</Heading>
+            </Box>
+          )
+        })}
+        </>
       </Flex>
       <Flex gap={'2'} mt={'1rem'}>
           <List w={'50%'}>
