@@ -1,45 +1,65 @@
 import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, Input, Select, FormControl, FormLabel } from '@chakra-ui/react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { change } from '../features/todo/todoSlice'
 import { useForm, SubmitHandler } from "react-hook-form";
-import { TodoListProps } from './form';
+import { RootState } from '../app/store';
 
 type TodoItemProps = {
   isOpen: boolean
-  onClose: () => void
+  onCloseSelectedModal: () => void
   id: number
   status: string
   title: string
   description: string
+  date: string
+  today: string
+  selectedItem: number
 }
 
-export const TodoItem= ({ isOpen, onClose, id, status, title, description}: TodoItemProps) => {
+export type SubmitTodoItemProps = {
+  id: number
+  title: string
+  description: string
+  status: string
+  date: string
+  judgeTerm: boolean
+}
+
+export const TodoItem= ({ isOpen, onCloseSelectedModal, id, status, title, description, date, today, selectedItem}: TodoItemProps) => {
   const dispatch = useDispatch();
-  const { register, handleSubmit } = useForm<TodoListProps>();
-  const onChangeSubmit: SubmitHandler<TodoListProps> = data => {
-    const changeTodo = {
-      id: id,
-      status: data.status,
-      title: data.title,
-      description: data.description,
+  const statusList = useSelector((state: RootState) => state.addStatus)
+  const { register, handleSubmit } = useForm<SubmitTodoItemProps>();
+  const onChangeSubmit: SubmitHandler<SubmitTodoItemProps> = data => {
+    const judgeTerm = today > data.date
+    if(id === selectedItem){
+      const changeTodo = {
+        id: id,
+        status: data.status,
+        title: data.title,
+        description: data.description,
+        date: data.date,
+        judgeTerm: judgeTerm
+      }
+      dispatch(change(changeTodo))
     }
-    dispatch(change(changeTodo))
+    onCloseSelectedModal()
   };
-  const optionList = ['TODO', 'DOING', 'DONE']
+
+  
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onCloseSelectedModal}>
         <ModalOverlay />
         <ModalContent>
-          <ModalCloseButton />
-          <ModalBody>
+          <ModalCloseButton zIndex={99}/>
+          <ModalBody p={'.8rem'}>
             <form onSubmit={handleSubmit(onChangeSubmit)}>
               <FormControl mb={'.8rem'}>
                 <FormLabel>ステータス</FormLabel>
-                <Select placeholder={'ステータスを選んでください。'} defaultValue={status} {...register('status')} >
-                  {optionList.map((item, index) => {
-                    return <option key={index} value={item}>{item}</option>
+                <Select value={status} {...register('status')} >
+                  {statusList.statusList.map((item, index) => {
+                    return <option key={index} value={item.status}>{item.status}</option>
                   })}
                 </Select>
               </FormControl>
@@ -51,7 +71,11 @@ export const TodoItem= ({ isOpen, onClose, id, status, title, description}: Todo
                 <FormLabel>内容</FormLabel>
                 <Input defaultValue={description} {...register('description')} />
               </FormControl>
-              <Button type={'submit'} onClick={onClose}>変更する</Button>
+              <FormControl mb={'.8rem'}>
+                <FormLabel>期限</FormLabel>
+                <Input type={'date'} defaultValue={date} {...register('date')} />
+              </FormControl>
+              <Button type={'submit'}>変更する</Button>
             </form>
           </ModalBody>
         </ModalContent>

@@ -6,6 +6,8 @@ export type TodoState = {
   title: string
   description: string
   status: string
+  date: string
+  judgeTerm: boolean
 }
 
 export type TodoListState = {
@@ -27,10 +29,13 @@ export const todoSlice = createSlice({
       state.todoList = state.todoList.filter(todo => todo.title !== action.payload)
     },
     change: (state, action: PayloadAction<TodoState>) => {
-      state.todoList.map(todo => (
+      state.todoList.filter(todo => todo.id === action.payload.id).map(todo => (
+        todo.id = action.payload.id,
         todo.title = action.payload.title,
         todo.status = action.payload.status,
-        todo.description = action.payload.description
+        todo.description = action.payload.description,
+        todo.date = action.payload.date,
+        todo.judgeTerm = action.payload.judgeTerm
       ))
     }
   },

@@ -12,7 +12,7 @@ export const AddStatusForm = () => {
   };
   return(
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FormControl>
+      <FormControl mb={'.8rem'}>
         <FormLabel>ステータス</FormLabel>
         <Input type={'text'} {...register('status')} />
       </FormControl>

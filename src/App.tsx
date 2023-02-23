@@ -7,9 +7,9 @@ const App = () => {
   return (
     <Box m={'1.6rem'}>
       <Heading as={'h1'} mb={'.8rem'}>TODO</Heading>
-      <Form />
+      <Form/>
       <AddStatusForm />
-      <TodoList />
+      <TodoList/>
     </Box>
   );
 }

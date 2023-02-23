@@ -28,7 +28,7 @@ export const statusSlice = createSlice({
   reducers: {
     addStatus: (state, action: PayloadAction<TodoStatusType>) => {
       const filterStatusList = state.statusList.filter(item => item !== action.payload)
-      if(filterStatusList) state.statusList.push(action.payload)
+      if(filterStatusList.length) state.statusList.push(action.payload)
     }
   },
 })
