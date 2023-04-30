@@ -13,7 +13,7 @@ export const TodoList= () => {
   const todo = useSelector((state: RootState) => state.addTodo)
   const status = useSelector((state: RootState) => state.addStatus)
   const dispatch = useDispatch()
-  const [selectedItem, setSelectedItem] = useState<number>(1)
+  const [selectedItem, setSelectedItem] = useState<number | undefined>(undefined)
   const [today, setToday] = useState<string>('')
   const listItemWidth = Math.floor(100 / status.statusList.length)
   useEffect(() => {
@@ -30,44 +30,52 @@ export const TodoList= () => {
   }
 
   const onCloseSelectedModal = () => {
-    setSelectedItem(0)
+    setSelectedItem(undefined)
     onClose()
   }
 
-  const todoRemove = (title: string) => {
-    dispatch(remove(title))
+  const todoRemove = (id: number) => {
+    dispatch(remove(id))
   }
   
   return (
     <>
       <Heading as={'h2'} size={'md'} mt={'2.4rem'}>TODO一覧</Heading>
-      <Flex gap={'2'} mt={'1rem'}>
-        <>
-        {status.statusList.map((statusItem, index) => {
-          return(
-            <Box key={index} width={`${listItemWidth}%`}>
-              <Heading as={'h3'} size={'sm'}>{statusItem.status}</Heading>
-            </Box>
-          )
-        })}
-        </>
-      </Flex>
-      <Flex gap={'2'} mt={'1rem'}>
-          <List w={'50%'}>
-              {todo.todoList.map((item, index) =>
-                <ListItem key={index} mb={'.8rem'}>
-                    <Link onClick={() => onOpenSelectedModal(item.id)}>
-                      <Card bg={item.judgeTerm ? 'teal.300' : 'white'}>
-                        <CardBody>
-                          <Text mb={'.8rem'}>{item.title}</Text>
-                          <Button fontSize={'.8rem'} onClick={() => todoRemove(item.title)}>remove</Button>
-                        </CardBody>
-                      </Card>
-                    </Link>
-                  </ListItem>
-                )}
-          </List>
+        <Flex gap={'2'} mt={'1rem'}>
           <>
+            {status.statusList.map((status, index) => {
+              return(
+                <Box key={index} w={`${listItemWidth}%`}>
+                  <Heading as={'h3'} size={'sm'}>{status.status}</Heading>
+                  <>
+                    {todo.todoList.filter((todo) => todo.status === status.status).map((todoListByStatus) => {
+                      return(
+                        <List w={`${listItemWidth}%`}>
+                          <ListItem mb={'.8rem'}>
+                            <Link onClick={() => onOpenSelectedModal(todoListByStatus.id)}>
+                              <Card bg={todoListByStatus.judgeTerm ? 'teal.300' : 'white'}>
+                                <CardBody>
+                                  <Text mb={'.8rem'}>{todoListByStatus.title}</Text>
+                                  <Button
+                                    fontSize={'.8rem'}
+                                    onClick={() => todoRemove(todoListByStatus.id)}
+                                  >
+                                    削除
+                                  </Button>
+                                </CardBody>
+                              </Card>
+                            </Link>
+                          </ListItem>
+                        </List>
+                      )
+                    })}
+                  </>
+                </Box>
+              )
+            })}
+          </>
+        </Flex>
+        <>
           {todo.todoList.filter(todo => todo.id === selectedItem).map((todoItem, index) => {
             return(
               <TodoItem
@@ -84,8 +92,7 @@ export const TodoList= () => {
               />
             )
           })}
-          </>
-        </Flex>
+        </>
     </>
   );
 }

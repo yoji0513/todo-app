@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { change } from '../features/todo/todoSlice'
 import { useForm, SubmitHandler } from "react-hook-form";
 import { RootState } from '../app/store';
+import { useState } from 'react';
 
 type TodoItemProps = {
   isOpen: boolean
@@ -13,7 +14,7 @@ type TodoItemProps = {
   description: string
   date: string
   today: string
-  selectedItem: number
+  selectedItem: number | undefined
 }
 
 export type SubmitTodoItemProps = {
@@ -26,6 +27,7 @@ export type SubmitTodoItemProps = {
 }
 
 export const TodoItem= ({ isOpen, onCloseSelectedModal, id, status, title, description, date, today, selectedItem}: TodoItemProps) => {
+  const [selectedStatus, setSelectedStatus] = useState(status)
   const dispatch = useDispatch();
   const statusList = useSelector((state: RootState) => state.addStatus)
   const { register, handleSubmit } = useForm<SubmitTodoItemProps>();
@@ -45,7 +47,9 @@ export const TodoItem= ({ isOpen, onCloseSelectedModal, id, status, title, descr
     onCloseSelectedModal()
   };
 
-  
+  const statushandleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(e.target.value)
+  }
 
   return (
     <>
@@ -57,7 +61,7 @@ export const TodoItem= ({ isOpen, onCloseSelectedModal, id, status, title, descr
             <form onSubmit={handleSubmit(onChangeSubmit)}>
               <FormControl mb={'.8rem'}>
                 <FormLabel>ステータス</FormLabel>
-                <Select value={status} {...register('status')} >
+                <Select value={selectedStatus} {...register('status')} onChange={statushandleChange}>
                   {statusList.statusList.map((item, index) => {
                     return <option key={index} value={item.status}>{item.status}</option>
                   })}
