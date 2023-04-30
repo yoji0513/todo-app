@@ -1,9 +1,9 @@
+import { useState } from 'react';
 import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, Input, Select, FormControl, FormLabel } from '@chakra-ui/react'
 import { useDispatch, useSelector } from 'react-redux'
 import { change } from '../features/todo/todoSlice'
 import { useForm, SubmitHandler } from "react-hook-form";
 import { RootState } from '../app/store';
-import { useState } from 'react';
 
 type TodoItemProps = {
   isOpen: boolean
@@ -47,7 +47,7 @@ export const TodoItem= ({ isOpen, onCloseSelectedModal, id, status, title, descr
     onCloseSelectedModal()
   };
 
-  const statushandleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const statusHandleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(e.target.value)
   }
 
@@ -61,7 +61,7 @@ export const TodoItem= ({ isOpen, onCloseSelectedModal, id, status, title, descr
             <form onSubmit={handleSubmit(onChangeSubmit)}>
               <FormControl mb={'.8rem'}>
                 <FormLabel>ステータス</FormLabel>
-                <Select value={selectedStatus} {...register('status')} onChange={statushandleChange}>
+                <Select value={selectedStatus} {...register('status')} onChange={statusHandleChange}>
                   {statusList.statusList.map((item, index) => {
                     return <option key={index} value={item.status}>{item.status}</option>
                   })}
